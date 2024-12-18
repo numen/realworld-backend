@@ -1,2 +1,4 @@
 .env
-.database/dbdata
+/database/dbdata
+init-jwt.sh
+run_bash.sh

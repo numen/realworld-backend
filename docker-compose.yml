@@ -2,9 +2,12 @@ version: "3.8"
 
 services:
     laravel:
+        #env_file: ".env"
         image: kooldev/php:8.1-nginx
         volumes:
-            - .:/app
+            - ./${LARAVEL_PATH}:/app
+        environment:
+          ASUSER: "${UID}"
         ports:
             - "8000:80"
         networks:
