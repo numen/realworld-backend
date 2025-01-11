@@ -11,7 +11,8 @@ class AuthController extends Controller
 
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login','register']]);
+        //$this->middleware('auth:api', ['except' => ['login','register']]);
+        $this->middleware('auth:jwt', ['except' => ['login','register']]);
     }
 
     public function login(Request $request)
@@ -31,6 +32,7 @@ class AuthController extends Controller
         }
 
         $user = Auth::user();
+
         return response()->json([
                 'status' => 'success',
                 'user' => $user,
@@ -54,6 +56,8 @@ class AuthController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
+
+
 
         $token = Auth::login($user);
         return response()->json([

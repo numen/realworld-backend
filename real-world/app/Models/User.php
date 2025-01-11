@@ -7,9 +7,11 @@ use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
+
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -23,17 +25,13 @@ class User extends Authenticatable implements JWTSubject
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
+        'username',
         'email',
         'password',
+        'bio', // nullable
+        'image', // nullable
     ];
-    /*
- *  "email": "jake@jake.jake",
-    "token": "jwt.token.here",
-    "username": "jake",
-    "bio": "I work at statefarm",
-    "image": null
- * */
+
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -73,4 +71,36 @@ class User extends Authenticatable implements JWTSubject
     {
         return [];
     }
+
+    /**
+     * Get users that follow this user
+     */
+    public function followers(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'followers', 'following_id', 'follower_id');
+    }
+
+    /*
+    * Get users that are followed by this user
+    */
+    public function following() {
+        return $this->belongsToMany(User::class, 'followers', 'follower_id', 'following_id');
+    }
+
+    public function isFollowing(string $userId): bool {
+        return $this->followers()
+            ->where('follower_id', $userId)
+            ->exists();
+    }
+
+	public function articles()
+    {
+        return $this->hasMany(Article::class, 'user_id');
+    }
+
+    public function favoriteArticles(): BelongsToMany
+    {
+        return $this->belongsToMany(Article::class, 'favorite_articles');
+    }
+
 }
